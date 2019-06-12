@@ -21,6 +21,7 @@ sig Laboratory{
 sig Project{
     laboratories: set Laboratory,
     professors: set Professor,
+    applications: set Application,
     tags: set Tag
 }
 
@@ -42,7 +43,22 @@ fact {
 
 //Professor facts
 fact {
-    all p: Professor | p.projects in p.laboratories.projects //Todo projeto de um professor está associado a um laboratório do qual ele faz parte
+    // relação entre n:m entre professor e project.
+    all proj: Project | (all prof: Professor | proj in prof.projects iff prof in proj.professors)
+    
+    // relação entre n:m entre laboratory e project.
+    all lab: Laboratory | (all proj: Project | lab in proj.laboratories iff proj in lab.projects)
+    
+    // relação entre n:m entre laboratory e professor.
+    all prof: Professor | (all lab: Laboratory | lab in prof.laboratories iff prof in lab.professors)
+
+    //relação 1:n entre Project e Application
+    all a: Application | (all p: Project | a in p.applications iff a.project = p)
+    
 }
 
-show
+pred show {
+	#Professor = 2
+	#Project = 2
+}
+run show for 3
